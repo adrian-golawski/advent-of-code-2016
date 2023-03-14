@@ -23,9 +23,31 @@ pub fn solve(input: &str) -> Option<(i32, i32)> {
     let part_1 = position.coordinates.0.abs() + position.coordinates.1.abs();
     let first_repetition = position.find_first_repetition();
 
-    let part_2 = first_repetition.0.abs() + first_repetition.1.abs();
+    if let Some((x, y)) = first_repetition {
+        let part_2 = x.abs() + y.abs();
+        return Some((part_1, part_2));
+    }
 
-    Some((part_1, part_2))
+    None
+}
+
+pub fn animation_data(input: &str) -> (Vec<(i32, i32)>, Option<(i32, i32)>) {
+    let instructions: Vec<Instruction> = input
+        .split(", ")
+        .map(Instruction::parse)
+        .map(Result::unwrap)
+        .map(|p| p.1)
+        .collect();
+
+    let mut position = Position::new();
+
+    for i in instructions {
+        position.execute_instruction(&i);
+    }
+
+    let first_repetition = position.find_first_repetition();
+
+    return (position.history, first_repetition);
 }
 
 #[derive(Debug)]
@@ -73,6 +95,7 @@ impl Position {
         for _i in 0..instruction.distance {
             let (x, y) = self.coordinates;
             self.coordinates = match &self.direction {
+                // Remmeber: 0,0 is at North-West
                 Direction::North => (x, y + 1),
                 Direction::South => (x, y - 1),
                 Direction::East => (x + 1, y),
@@ -84,18 +107,18 @@ impl Position {
         return self;
     }
 
-    fn find_first_repetition(self) -> (i32, i32) {
+    fn find_first_repetition(&self) -> Option<(i32, i32)> {
         let mut history = HashSet::new();
 
-        for h in self.history {
+        for h in &self.history {
             if history.contains(&h) {
-                return h;
+                return Some(*h);
             } else {
                 history.insert(h);
             }
         }
 
-        (0, 0)
+        None
     }
 }
 

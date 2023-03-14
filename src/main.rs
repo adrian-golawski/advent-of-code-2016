@@ -5,7 +5,7 @@ mod day1;
 
 fn main() -> Result<(), eframe::Error> {
     let options = eframe::NativeOptions {
-        initial_window_size: Some(egui::vec2(800.0, 600.0)),
+        initial_window_size: Some(egui::vec2(1200.0, 800.0)),
         ..Default::default()
     };
 
@@ -23,7 +23,7 @@ struct MyApp {
 }
 
 pub trait View {
-    fn ui(&mut self, ui: &mut egui::Ui);
+    fn ui(&mut self, ctx: &egui::Context, ui: &mut egui::Ui);
 }
 
 struct Day {
@@ -34,7 +34,7 @@ struct Day {
 struct InitialScreen {}
 
 impl View for InitialScreen {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ctx: &egui::Context, ui: &mut egui::Ui) {
         ui.heading("👈 To see a solution, use the picker from the left");
     }
 }
@@ -141,7 +141,7 @@ impl eframe::App for MyApp {
                             ui.heading("Intro");
                         }
                         ui.separator();
-                        view.ui(ui);
+                        view.ui(ctx, ui);
                     }
                     None => self.active_ui = 0,
                 }
