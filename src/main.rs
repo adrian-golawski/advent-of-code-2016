@@ -1,6 +1,7 @@
 use eframe::egui;
 use egui::RichText;
 
+mod _day_n;
 mod day1;
 
 #[cfg(target_arch = "wasm32")]
@@ -45,36 +46,14 @@ struct MyApp {
 }
 
 pub trait View {
-    fn ui(&mut self, ctx: &egui::Context, ui: &mut egui::Ui);
+    fn get_summary(&self) -> String;
+    fn input(&mut self, ctx: &egui::Context, ui: &mut egui::Ui);
+    fn solution(&mut self, ctx: &egui::Context, ui: &mut egui::Ui);
 }
 
 struct Day {
     num: u8,
     ui: Option<Box<dyn View>>,
-}
-
-struct InitialScreen {}
-
-impl View for InitialScreen {
-    fn ui(&mut self, ctx: &egui::Context, ui: &mut egui::Ui) {
-        ui.heading("Welcome to my Advent of Code 2016 solution demo.");
-
-        ui.add_space(10.0);
-        ui.label("Advent of Code is a yearly programming exercise where you can solve daily algorithmic challenges together with thousands of programmers. You can learn more about it here: ");
-        ui.hyperlink("https://adventofcode.com/");
-
-        ui.add_space(10.0);
-        ui.label("This page is my solution to 2016 edition with visualisations written in Rust and compiled to WebAssembly for easy Web availability :)");
-
-        ui.add_space(10.0);
-        ui.label("You can check my repositiory here: ");
-        ui.hyperlink("https://github.com/adrian-golawski/advent-of-code-2016")
-            .on_hover_text("Advent of Code 2016 by Adrian Goławski");
-
-        ui.separator();
-
-        ui.heading("👈 To see a solution, use the picker from the left");
-    }
 }
 
 impl Default for MyApp {
@@ -85,7 +64,7 @@ impl Default for MyApp {
             days: vec![
                 Day {
                     num: 0,
-                    ui: Some(Box::new(InitialScreen {})),
+                    ui: Some(Box::new(_day_n::Screen::default())),
                 },
                 Day {
                     num: 1,
@@ -179,11 +158,38 @@ impl eframe::App for MyApp {
                                 "https://adventofcode.com/2016/day/{}",
                                 active_day.num
                             ));
+                            ui.separator();
+
+                            ui.heading("Summary");
+                            ui.label(view.get_summary());
+
+                            ui.separator();
+
+                            ui.heading("Input");
+                            view.input(ctx, ui);
+
+                            ui.separator();
+
+                            view.solution(ctx, ui);
                         } else {
-                            ui.heading("Intro");
+                            ui.heading("Welcome to my Advent of Code 2016 solution demo.");
+
+                            ui.add_space(10.0);
+                            ui.label("Advent of Code is a yearly programming exercise where you can solve daily algorithmic challenges together with thousands of programmers. You can learn more about it here: ");
+                            ui.hyperlink("https://adventofcode.com/");
+
+                            ui.add_space(10.0);
+                            ui.label("This page is my solution to 2016 edition with visualisations written in Rust and compiled to WebAssembly for easy Web availability :)");
+
+                            ui.add_space(10.0);
+                            ui.label("You can check my repositiory here: ");
+                            ui.hyperlink("https://github.com/adrian-golawski/advent-of-code-2016")
+                                .on_hover_text("Advent of Code 2016 by Adrian Goławski");
+
+                            ui.separator();
+
+                            ui.heading("👈 To see a solution, use the picker from the left");
                         }
-                        ui.separator();
-                        view.ui(ctx, ui);
                     }
                     None => self.active_ui = 0,
                 }

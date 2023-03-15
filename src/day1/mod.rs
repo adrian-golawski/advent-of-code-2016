@@ -98,18 +98,8 @@ impl Screen {
 }
 
 impl View for Screen {
-    fn ui(&mut self, ctx: &egui::Context, ui: &mut Ui) {
-        if self.input.enable_custom_input {
-            self.update_input(&self.input.custom_input.clone());
-        } else {
-            let default_string = include_str!("input.txt");
-
-            self.update_input(default_string);
-        }
-        ui.heading("Summary");
-
-        ui.label(
-            r#"You get input passed as a line of instructions:
+    fn get_summary(&self) -> String {
+        r#"You get input passed as a line of instructions:
 Ex.
     R2, L13, R7
     R20, R200, L12
@@ -117,12 +107,16 @@ Ex.
 Your character starts at (0, 0) looking North and move according to the instructions (L10 = Turn left and move 10 tiles).
 
 Part 1: Execute the instructions and return your position in Taxi Cab distance
-Part 2: Return Taxi Cab distance to the first place where your paths crossed."#,
-        );
+Part 2: Return Taxi Cab distance to the first place where your paths crossed."#.to_string()
+    }
 
-        ui.separator();
-
-        ui.heading("Input");
+    fn input(&mut self, _ctx: &egui::Context, ui: &mut egui::Ui) {
+        if self.input.enable_custom_input {
+            self.update_input(&self.input.custom_input.clone());
+        } else {
+            let default_string = include_str!("input.txt");
+            self.update_input(default_string);
+        }
 
         ui.horizontal(|ui| {
             ui.checkbox(&mut self.input.enable_custom_input, "Custom input");
@@ -152,11 +146,11 @@ Part 2: Return Taxi Cab distance to the first place where your paths crossed."#,
                 TextEdit::multiline(&mut self.input.current_input),
             );
         });
+    }
 
-        ui.separator();
-
+    fn solution(&mut self, ctx: &egui::Context, ui: &mut Ui) {
         if let Some((part1, part2)) = self.input.solution {
-            ui.heading("Solution found:");
+            ui.heading("Solution");
 
             ui.label(format!("Part 1: {}", part1));
             ui.label(format!("Part 2: {}", part2));
@@ -171,6 +165,8 @@ Part 2: Return Taxi Cab distance to the first place where your paths crossed."#,
         }
 
         if let Some(data) = &self.animation.data {
+            ui.heading("Animation");
+
             ui.horizontal(|ui| {
                 if ui.button("Step").clicked() {
                     self.animation.step = true;
@@ -206,35 +202,35 @@ Part 2: Return Taxi Cab distance to the first place where your paths crossed."#,
                 .fold(0, |max_value, (x, y)| max_value.max(x.abs()).max(y.abs()))
                 + 10;
 
-            let mut painter_max_size = ui.available_width().min(ui.available_height()).min(500.0);
-            let mut painter_size = egui::vec2(painter_max_size, painter_max_size);
+            let painter_max_size = ui.available_width().min(ui.available_height()).min(500.0);
+            let painter_size = egui::vec2(painter_max_size, painter_max_size);
 
             let (res, painter) =
                 ui.allocate_painter(painter_size, Sense::focusable_noninteractive());
 
             let center = res.rect.center().to_vec2();
 
-            let SIDE: f32 = painter_max_size / (max_value as f32 * 2.0);
+            let side: f32 = painter_max_size / (max_value as f32 * 2.0);
 
             let to_panel_pos = |(x, y): (i32, i32)| {
-                (egui::vec2(x as f32 * SIDE, y as f32 * -SIDE) + center).to_pos2()
+                (egui::vec2(x as f32 * side, y as f32 * -side) + center).to_pos2()
             };
 
-            for x in (-max_value..max_value).step_by(10) {
-                for y in (-max_value..max_value).step_by(10) {
-                    let dot = (x, y);
+            // for x in (-max_value..max_value).step_by(10) {
+            //     for y in (-max_value..max_value).step_by(10) {
+            //         let dot = (x, y);
 
-                    let is_zero = x == 0 && y == 0;
+            //         let is_zero = x == 0 && y == 0;
 
-                    let color = if is_zero {
-                        Color32::DARK_RED
-                    } else {
-                        Color32::LIGHT_GRAY
-                    };
+            //         let color = if is_zero {
+            //             Color32::DARK_RED
+            //         } else {
+            //             Color32::LIGHT_GRAY
+            //         };
 
-                    painter.circle_stroke(to_panel_pos(dot), 0.5, Stroke::new(0.5, color));
-                }
-            }
+            //         painter.circle_stroke(to_panel_pos(dot), 0.5, Stroke::new(0.5, color));
+            //     }
+            // }
 
             for d in &self.animation.drawn_steps {
                 painter.circle_stroke(to_panel_pos(*d), 1.0, Stroke::new(1.0, Color32::WHITE));
