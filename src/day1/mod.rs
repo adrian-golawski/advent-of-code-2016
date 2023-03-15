@@ -106,11 +106,13 @@ impl View for Screen {
 
             self.update_input(default_string);
         }
+        ui.heading("Summary");
 
         ui.label(
             r#"You get input passed as a line of instructions:
-
-    Ex. R1, L20, R10
+Ex.
+    R2, L13, R7
+    R20, R200, L12
 
 Your character starts at (0, 0) looking North and move according to the instructions (L10 = Turn left and move 10 tiles).
 
@@ -151,11 +153,16 @@ Part 2: Return Taxi Cab distance to the first place where your paths crossed."#,
             );
         });
 
+        ui.separator();
+
         if let Some((part1, part2)) = self.input.solution {
+            ui.heading("Solution found:");
+
             ui.label(format!("Part 1: {}", part1));
             ui.label(format!("Part 2: {}", part2));
+
+            ui.separator();
         }
-        ui.separator();
 
         if self.animation.step || self.animation.play {
             for _ in 0..self.animation.speed {

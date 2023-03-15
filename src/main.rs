@@ -3,6 +3,28 @@ use egui::RichText;
 
 mod day1;
 
+#[cfg(target_arch = "wasm32")]
+fn main() {
+    console_error_panic_hook::set_once();
+
+    tracing_wasm::set_as_global_default();
+
+    let web_options = eframe::WebOptions::default();
+
+    wasm_bindgen_futures::spawn_local(async {
+        eframe::start_web(
+            // this is the id of the `<canvas>` element we have
+            // in our `index.html`
+            "canvas",
+            web_options,
+            Box::new(|_cc| Box::new(MyApp::default())),
+        )
+        .await
+        .expect("failed to start eframe");
+    });
+}
+
+#[cfg(not(target_arch = "wasm32"))]
 fn main() -> Result<(), eframe::Error> {
     let options = eframe::NativeOptions {
         initial_window_size: Some(egui::vec2(1200.0, 800.0)),
@@ -35,6 +57,22 @@ struct InitialScreen {}
 
 impl View for InitialScreen {
     fn ui(&mut self, ctx: &egui::Context, ui: &mut egui::Ui) {
+        ui.heading("Welcome to my Advent of Code 2016 solution demo.");
+
+        ui.add_space(10.0);
+        ui.label("Advent of Code is a yearly programming exercise where you can solve daily algorithmic challenges together with thousands of programmers. You can learn more about it here: ");
+        ui.hyperlink("https://adventofcode.com/");
+
+        ui.add_space(10.0);
+        ui.label("This page is my solution to 2016 edition with visualisations written in Rust and compiled to WebAssembly for easy Web availability :)");
+
+        ui.add_space(10.0);
+        ui.label("You can check my repositiory here: ");
+        ui.hyperlink("https://github.com/adrian-golawski/advent-of-code-2016")
+            .on_hover_text("Advent of Code 2016 by Adrian Goławski");
+
+        ui.separator();
+
         ui.heading("👈 To see a solution, use the picker from the left");
     }
 }
@@ -43,7 +81,7 @@ impl Default for MyApp {
     fn default() -> Self {
         Self {
             show_side_panel: true,
-            active_ui: 1,
+            active_ui: 0,
             days: vec![
                 Day {
                     num: 0,
@@ -137,6 +175,10 @@ impl eframe::App for MyApp {
                     Some(view) => {
                         if active_day.num != 0 {
                             ui.heading(format!("Day {}", active_day.num));
+                            ui.hyperlink(format!(
+                                "https://adventofcode.com/2016/day/{}",
+                                active_day.num
+                            ));
                         } else {
                             ui.heading("Intro");
                         }
