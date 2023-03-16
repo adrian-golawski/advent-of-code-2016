@@ -31,7 +31,7 @@ pub fn solve(input: &str) -> Option<(i32, i32)> {
     None
 }
 
-pub fn animation_data(input: &str) -> (Vec<(i32, i32)>, Option<(i32, i32)>) {
+pub fn animation_data(input: &str) -> Vec<(i32, i32)> {
     let instructions: Vec<Instruction> = input
         .split(", ")
         .map(Instruction::parse)
@@ -45,9 +45,7 @@ pub fn animation_data(input: &str) -> (Vec<(i32, i32)>, Option<(i32, i32)>) {
         position.execute_instruction(&i);
     }
 
-    let first_repetition = position.find_first_repetition();
-
-    return (position.history, first_repetition);
+    return position.history;
 }
 
 #[derive(Debug)]

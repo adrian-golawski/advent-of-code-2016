@@ -1,7 +1,7 @@
-use std::time::Duration;
+use std::{collections::HashMap, time::Duration};
 
 use eframe::egui;
-use egui::{Color32, RichText, Sense, Slider, Stroke, TextEdit, Ui};
+use egui::{Align, Align2, Color32, FontId, RichText, Sense, Slider, Stroke, TextEdit, Ui};
 
 use crate::View;
 
@@ -24,7 +24,6 @@ pub struct Input {
 pub struct Animation {
     data: Option<Vec<(i32, i32)>>,
     drawn_steps: Vec<(i32, i32)>,
-    path_crossed: Option<(i32, i32)>,
     frame: usize,
     play: bool,
     step: bool,
@@ -36,7 +35,6 @@ impl Animation {
         Animation {
             data: None,
             drawn_steps: Vec::new(),
-            path_crossed: None,
             step: false,
             play: false,
             speed: 1,
@@ -88,10 +86,7 @@ impl Screen {
 
             if self.input.is_input_valid {
                 self.input.solution = solution::solve(input);
-                let (data, repetition) = solution::animation_data(input);
-
-                self.animation.data = Some(data);
-                self.animation.path_crossed = repetition;
+                self.animation.data = Some(solution::animation_data(input));
             }
         }
     }
@@ -200,9 +195,9 @@ Part 2: Return Taxi Cab distance to the first place where your paths crossed."#.
             let max_value = data
                 .iter()
                 .fold(0, |max_value, (x, y)| max_value.max(x.abs()).max(y.abs()))
-                + 10;
+                + 100;
 
-            let painter_max_size = ui.available_width().min(ui.available_height()).min(500.0);
+            let painter_max_size = ui.available_width().min(ui.available_height());
             let painter_size = egui::vec2(painter_max_size, painter_max_size);
 
             let (res, painter) =
@@ -232,19 +227,55 @@ Part 2: Return Taxi Cab distance to the first place where your paths crossed."#.
             //     }
             // }
 
+            let mut visits: HashMap<(i32, i32), u32> = HashMap::new();
+            let mut first_found = None;
+
             for d in &self.animation.drawn_steps {
-                painter.circle_stroke(to_panel_pos(*d), 1.0, Stroke::new(1.0, Color32::WHITE));
+                painter.circle_filled(to_panel_pos(*d), 1.0, Color32::GRAY);
+                match visits.get(d) {
+                    Some(count) => {
+                        visits.insert(*d, count + 1);
+
+                        if first_found.is_none() {
+                            first_found = Some(d);
+                        }
+                    }
+                    None => {
+                        visits.insert(*d, 1);
+                    }
+                }
             }
 
-            for d in &self.animation.path_crossed {
-                painter.circle_stroke(to_panel_pos(*d), 5.0, Stroke::new(5.0, Color32::DARK_GREEN));
+            for (pos, count) in &visits {
+                if *count > 1 {
+                    painter.circle_filled(to_panel_pos(*pos), 2.0, Color32::DARK_RED);
+                }
             }
 
-            if let Some(last_step) = self.animation.drawn_steps.last() {
-                painter.circle_stroke(
-                    to_panel_pos(*last_step),
-                    2.0,
-                    Stroke::new(2.0, Color32::RED),
+            if let Some(pos) = first_found {
+                painter.text(
+                    to_panel_pos((pos.0 + 10, pos.1 + 10)),
+                    Align2::LEFT_BOTTOM,
+                    format!("First intersection:\n({}, {})", pos.0, pos.1),
+                    egui::FontId {
+                        size: 10.0,
+                        family: egui::FontFamily::Monospace,
+                    },
+                    Color32::RED,
+                );
+            }
+
+            if let Some(pos) = self.animation.drawn_steps.last() {
+                painter.circle_filled(to_panel_pos(*pos), 2.0, Color32::RED);
+                painter.text(
+                    to_panel_pos((pos.0 + 10, pos.1 + 10)),
+                    Align2::LEFT_BOTTOM,
+                    format!("({}, {})", pos.0, pos.1),
+                    egui::FontId {
+                        size: 10.0,
+                        family: egui::FontFamily::Monospace,
+                    },
+                    Color32::RED,
                 );
             }
 
