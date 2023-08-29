@@ -1,4 +1,5 @@
 mod day1;
+mod day2;
 
 use clap::Parser;
 
@@ -17,6 +18,7 @@ fn main() {
 
     match args.day {
         1 => day1::solve(include_str!("data/day1.txt")),
+        2 => day2::solve(include_str!("data/day2.txt")),
         _ => todo!(),
     }
 }
