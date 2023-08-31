@@ -52,25 +52,25 @@ pub fn solve(input: &str) {
         pointer: (1, 1),
     };
 
-    let code1: (String, &mut Keyboard) = instructions.iter().fold(
-        (String::new(), &mut part1),
-        |(mut code, mut keyboard), i| {
-            let (keyboard, c) = keyboard.execute_instructions(i);
-            code.push(c);
-            (code, keyboard)
-        },
-    );
+    let code1: (String, &mut Keyboard) =
+        instructions
+            .iter()
+            .fold((String::new(), &mut part1), |(mut code, keyboard), i| {
+                let (keyboard, c) = keyboard.execute_instructions(i);
+                code.push(c);
+                (code, keyboard)
+            });
 
     println!("Part One: {}", code1.0);
 
-    let code2: (String, &mut Keyboard) = instructions.iter().fold(
-        (String::new(), &mut part2),
-        |(mut code, mut keyboard), i| {
-            let (keyboard, c) = keyboard.execute_instructions(i);
-            code.push(c);
-            (code, keyboard)
-        },
-    );
+    let code2: (String, &mut Keyboard) =
+        instructions
+            .iter()
+            .fold((String::new(), &mut part2), |(mut code, keyboard), i| {
+                let (keyboard, c) = keyboard.execute_instructions(i);
+                code.push(c);
+                (code, keyboard)
+            });
 
     println!("Part Two: {}", code2.0);
 }
