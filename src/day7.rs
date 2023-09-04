@@ -7,10 +7,10 @@ pub fn solve(input: &str) {
     let lines: Vec<Vec<Piece>> = input.lines().flat_map(parse_line).map(|l| l.1).collect();
 
     let valid = lines.iter().filter(|line| is_valid_part_1(line)).count();
-    println!("Part One: {}", valid);
+    println!("Part One: {valid}");
 
     let valid = lines.iter().filter(|line| is_valid_part_2(line)).count();
-    println!("Part Two: {}", valid);
+    println!("Part Two: {valid}");
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -68,9 +68,9 @@ fn contains_aba(input: &str) -> Option<Vec<String>> {
     let mut patterns: Vec<String> = Vec::new();
     for i in 0..=input.len() - 3 {
         let (a, b, c) = (
-            input.chars().nth(i).unwrap(),
-            input.chars().nth(i + 1).unwrap(),
-            input.chars().nth(i + 2).unwrap(),
+            input.chars().nth(i)?,
+            input.chars().nth(i + 1)?,
+            input.chars().nth(i + 2)?,
         );
 
         if a == c && a != b {

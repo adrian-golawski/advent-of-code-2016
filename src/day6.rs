@@ -12,7 +12,7 @@ pub fn solve(input: &str) {
             } else {
                 map.insert(c, 1);
             }
-        })
+        });
     });
 
     let (part1, part2) = counts
@@ -33,9 +33,9 @@ pub fn solve(input: &str) {
             },
         );
 
-    println!("Part One: {}", part1);
+    println!("Part One: {part1}");
 
-    println!("Part Two: {}", part2);
+    println!("Part Two: {part2}");
 }
 
 #[cfg(test)]
