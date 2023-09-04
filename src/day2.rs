@@ -96,9 +96,9 @@ impl Keyboard {
             }
         }
 
-        let field = self.keys.get(&self.pointer).unwrap().clone();
+        let field = *self.keys.get(&self.pointer).unwrap();
 
-        return (self, field);
+        (self, field)
     }
 }
 

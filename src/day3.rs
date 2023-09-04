@@ -44,7 +44,7 @@ pub fn solve(input: &str) {
     println!("Part Two: {}", valid_triangles);
 }
 
-fn is_valid_triangle(l: &Vec<u32>) -> bool {
+fn is_valid_triangle(l: &[u32]) -> bool {
     l[0] + l[1] > l[2] && l[0] + l[2] > l[1] && l[1] + l[2] > l[0]
 }
 

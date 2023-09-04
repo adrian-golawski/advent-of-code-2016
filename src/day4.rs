@@ -24,7 +24,7 @@ pub fn solve(input: &str) {
 
     let decoded: &&Line = verified
         .iter()
-        .find(|l| rotate_by_sector(&l).eq("northpole object storage"))
+        .find(|l| rotate_by_sector(l).eq("northpole object storage"))
         .unwrap();
 
     println!("Part Two: {}", decoded.sector);
@@ -91,7 +91,7 @@ fn rotate_by_sector(l: &Line) -> String {
         })
         .collect::<String>();
 
-    return name;
+    name
 }
 
 #[cfg(test)]
