@@ -4,6 +4,7 @@ mod day3;
 mod day4;
 mod day5;
 mod day6;
+mod day7;
 
 use clap::Parser;
 
@@ -27,6 +28,7 @@ fn main() {
         4 => day4::solve(include_str!("data/day4.txt")),
         5 => day5::solve(include_str!("data/day5.txt")),
         6 => day6::solve(include_str!("data/day6.txt")),
+        7 => day7::solve(include_str!("data/day7.txt")),
         _ => todo!(),
     }
 }
