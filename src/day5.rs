@@ -16,19 +16,10 @@ pub fn solve(input: &str) {
                 let pointer = hex.chars().nth(5).unwrap();
                 let value = hex.chars().nth(6).unwrap();
 
-                match pointer.to_digit(10) {
-                    Some(n) => {
-                        if n < 8 {
-                            // dbg!(hex, &hash2);
-                            match hash2[n as usize] {
-                                None => {
-                                    hash2[n as usize] = Some(value);
-                                }
-                                Some(_) => {}
-                            }
-                        }
+                if let Some(n) = pointer.to_digit(10) {
+                    if n < 8 && hash2[n as usize].is_none() {
+                        hash2[n as usize] = Some(value);
                     }
-                    None => {}
                 }
             }
 
